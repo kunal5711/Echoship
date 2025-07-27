@@ -14,8 +14,8 @@ app = FastAPI()
 load_dotenv()
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER') # Your Twilio number
-TO_PHONE_NUMBER = os.environ.get('TO_PHONE_NUMBER') # The number to call
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
+TO_PHONE_NUMBER = os.environ.get('TO_PHONE_NUMBER')
 
 # Initialize Twilio Client
 if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
@@ -30,11 +30,9 @@ async def voice_webhook():
     # This is the initial webhook from Twilio when a call comes in
     # OR, it's the URL Twilio calls when you initiate an outbound call to handle the response
     response = VoiceResponse()
-    # Replace YOUR_NGROK_URL with your actual ngrok URL.
-    # This URL must be accessible by Twilio.
-    # When Twilio calls this webhook, it then initiates the WebSocket stream back to YOUR_NGROK_URL/ws
     response.start().stream(url="https://echoship-1.onrender.com/ws")
-    response.say("Hello! This is a call initiated by your FastAPI server. Please speak now.") # Initial greeting
+    response.say("Hello! This is a call initiated by your FastAPI server. Please speak now.")
+    response.pause(length=60)
     return Response(content=str(response), media_type="application/xml")
 
 # --- New Endpoint to Initiate Outbound Call ---
@@ -46,9 +44,6 @@ async def make_call():
         raise HTTPException(status_code=500, detail="TWILIO_PHONE_NUMBER or TO_PHONE_NUMBER not set as environment variables.")
 
     try:
-        # Replace YOUR_NGROK_URL with your actual ngrok URL.
-        # This is the URL Twilio will hit once the call connects,
-        # which will then direct to your /voice webhook.
         call = client.calls.create(
             to=TO_PHONE_NUMBER,
             from_=TWILIO_PHONE_NUMBER,
@@ -75,7 +70,6 @@ async def websocket_endpoint(websocket: WebSocket):
             elif payload["event"] == "media":
                 audio_data = base64.b64decode(payload["media"]["payload"])
                 print(f"Received audio chunk of length: {len(audio_data)} bytes")
-                # You'll process this audio data with STT later
             elif payload["event"] == "stop":
                 print("Call stopped.")
                 break
