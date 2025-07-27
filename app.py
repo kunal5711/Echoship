@@ -33,7 +33,7 @@ async def voice_webhook():
     # Replace YOUR_NGROK_URL with your actual ngrok URL.
     # This URL must be accessible by Twilio.
     # When Twilio calls this webhook, it then initiates the WebSocket stream back to YOUR_NGROK_URL/ws
-    response.start().stream(url="https://echoship.onrender.com/ws")
+    response.start().stream(url="https://echoship-1.onrender.com/ws")
     response.say("Hello! This is a call initiated by your FastAPI server. Please speak now.") # Initial greeting
     return Response(content=str(response), media_type="application/xml")
 
@@ -52,7 +52,7 @@ async def make_call():
         call = client.calls.create(
             to=TO_PHONE_NUMBER,
             from_=TWILIO_PHONE_NUMBER,
-            url="https://echoship.onrender.com/voice" # Twilio will request this URL to get TwiML instructions
+            url="https://echoship-1.onrender.com/voice" # Twilio will request this URL to get TwiML instructions
         )
         print(f"Call initiated! SID: {call.sid}")
         return {"message": "Call initiated successfully!", "call_sid": call.sid}
