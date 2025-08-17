@@ -11,7 +11,7 @@ def sts_connect():
     '''
     It is to load the deepgram api key and for establishing websocket connection with deepgram agent
     '''
-    api_key = os.getenv('DEEPGRAM_API_KEY')
+    api_key = os.environ.get('DEEPGRAM_API_KEY')
     if not api_key:
         raise ValueError("DEEPGRAM_API_KEY environment variable is not set")
 
@@ -169,9 +169,10 @@ async def router(websocket, path):
 
 # 🔹 Main event loop
 async def main():
-    async with websockets.serve(router, "0.0.0.0", 5000):
-        print("WebSocket server running on ws://0.0.0.0:5000")
-        # Keep running
+    port = int(os.environ.get("PORT", 5000))  # Render assigns PORT env var
+    async with websockets.serve(router, "0.0.0.0", port):
+        print(f"✅ WebSocket server running on ws://0.0.0.0:{port}")
+        # Run forever
         await asyncio.Future()
 
 
